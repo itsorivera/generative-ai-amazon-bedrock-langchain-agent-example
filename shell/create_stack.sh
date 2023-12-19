@@ -23,7 +23,7 @@ export GITHUB_TOKEN_SECRET_NAME=$(aws secretsmanager create-secret --name $STACK
 
 aws cloudformation create-stack \
 --stack-name ${STACK_NAME} \
---template-url https://magodytest-us-east-1.s3.amazonaws.com/AWS_CloudFormation_Bedrock_Assistant.yaml \
+--template-url https://s3.us-east-1.amazonaws.com/cf-templates-1idqdojpyngtz-us-east-1/2023-12-19T170242.853Zl35-AWS_CloudFormation_Bedrock_Assistant.yaml \
 --parameters \
 ParameterKey=S3ArtifactBucket,ParameterValue=${S3_ARTIFACT_BUCKET_NAME} \
 ParameterKey=DataLoaderS3Key,ParameterValue=${DATA_LOADER_S3_KEY} \
@@ -48,13 +48,3 @@ export LAMBDA_ARN=$(aws cloudformation describe-stacks \
 aws lexv2-models update-bot-alias --bot-alias-id 'TSTALIASID' --bot-alias-name 'TestBotAlias' --bot-id $LEX_BOT_ID --bot-version 'DRAFT' --bot-alias-locale-settings "{\"en_US\":{\"enabled\":true,\"codeHookSpecification\":{\"lambdaCodeHook\":{\"codeHookInterfaceVersion\":\"1.0\",\"lambdaARN\":\"${LAMBDA_ARN}\"}}}}"
 
 aws lexv2-models build-bot-locale --bot-id $LEX_BOT_ID --bot-version "DRAFT" --locale-id "en_US"
-
-export AMPLIFY_APP_ID=$(aws cloudformation describe-stacks \
-    --stack-name $STACK_NAME \
-    --query 'Stacks[0].Outputs[?OutputKey==`AmplifyAppID`].OutputValue' --output text)
-
-export AMPLIFY_BRANCH=$(aws cloudformation describe-stacks \
-    --stack-name $STACK_NAME \
-    --query 'Stacks[0].Outputs[?OutputKey==`AmplifyBranch`].OutputValue' --output text)
-
-aws amplify start-job --app-id $AMPLIFY_APP_ID --branch-name $AMPLIFY_BRANCH --job-type 'RELEASE'
